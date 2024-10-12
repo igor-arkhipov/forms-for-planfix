@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" fetchpriority="high" />
+
+  <style>
+    main {
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    form {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    #submitArea {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    #response {
+      max-width: 400px;
+      text-align: center;
+      padding: 2rem 1rem 1rem 1rem;
+      border-radius: 4px;
+      margin: 0 auto;
+    }
+
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+  </style>
+
+  <title>PF Simple form</title>
+  <!-- тут меняйте текст что пойдёт во вкладку браузера -->
+
+</head>
+
+<body>
+  <main class="container">
+
+    <h1>Simple form for Planfix</h1>
+    <!-- тут меняйте заголовок над формой -->
+
+    <form id="simpleform">
+
+      <!-- !! в форму можно ставить поля разного типа https://developer.mozilla.org/ru/docs/Web/HTML/Element/form  -->
+
+      <div>
+        <label for="name">Название задачи</label>
+        <input type="text" id="name" name="name" placeholder="Введите название" required />
+      </div>
+
+      <div>
+        <label for="description">Описание задачи</label>
+        <textarea id="description" name="description" placeholder="Введите описание" required></textarea>
+      </div>
+
+      <div>
+        <label for="phone">Телефон</label>
+        <input type="tel" inputmode="tel" id="phone" name="phone" placeholder="+79993331122" required />
+      </div>
+
+      <div>
+        <label for="email">Email</label>
+        <input type="email" inputmode="email" id="email" name="email" placeholder="name@gmail.com" required />
+      </div>
+
+      <div>
+        <label for="file">Файл</label>
+        <input type="file" id="file" name="file" />
+      </div>
+
+      <div>
+        <input type="checkbox" role="switch" id="agreement" name="agreement" required />
+        <label for="agreement">Я согласен с политикой обработки данных <a href="#"></a> </label>
+        <!-- выше вместо # можно поставить ссылку на текст вашей политики -->
+      </div>
+
+      <div id="submitArea">
+        <button type="submit" id="submitBtn">Отправить</button>
+      </div>
+    </form>
+    <div id="response" role="alert"></div>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.getElementById("simpleform");
+      const submitBtn = document.getElementById("submitBtn");
+      const responseDiv = document.getElementById("response");
+
+      async function submitForm(formNode) {
+        const formData = new FormData(formNode);
+
+        try {
+          const response = await fetch(
+            "https://YOUR_ACCOUNT.planfix.ru/webhook/file/...",
+            // выше ссылка на вебхук (POST-запрос multipart/form-data)
+            {
+              method: "POST",
+              body: formData,
+            },
+          );
+
+          if (!response.ok)
+            throw new Error(`HTTP error! Status: ${response.status}`);
+
+          const data = await response.json();
+          // тут мы ожидаем что вебхук вернёт ответ JSON с ID объекта
+
+          // (1) простой вариант с простым выводом текста
+          responseDiv.innerHTML = `<p>Спасибо за обращение</p>`;
+          responseDiv.className = "success";
+
+
+          // // (2) вариант вывода ответа с выводом ссылки на емайл созданной задачи
+          // const taskNumber = data.task;
+          // const emailAddress = `task+${taskNumber}@YOUR_ACCOUNT.planfix.ru`;  // меняйте урл аккаунта на ваш
+          // const emailSubject = encodeURIComponent(`Дополнение по заявке #${taskNumber}`); // это тема письма
+          // const emailBody = encodeURIComponent('Я хочу дополнить информацию ...'); // это тело письма
+          // const mailtoUrl = `mailto:${emailAddress}?subject=${emailSubject}&body=${emailBody}`;
+          // responseDiv.innerHTML = `<p>Заявка успешно создана!<br>Вы можете отправить дополнительную информацию напрямую в <a href="${mailtoUrl}">заявку #${taskNumber}</a></p>`;
+          // responseDiv.className = "success";
+
+
+          // // (3) вариант вывода ответа с показом ID задачи и ссылкой на неё
+          // const taskNumber = data.task;
+          // const taskUrl = `https://YOUR_ACCOUNT.planfix.ru/task/${taskNumber}`; // меняйте урл аккаунта на ваш
+          // responseDiv.innerHTML = `<p>Успех! Задача <a href="${taskUrl}" target="_blank">#${taskNumber}</a> создана</p>`;
+          // responseDiv.className = "success";
+
+
+        } catch (error) {
+          responseDiv.innerHTML = `<p>Ошибка: ${error.message}</p>`;
+          responseDiv.className = "error";
+
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.removeAttribute("aria-busy");
+          submitBtn.textContent = "Отправить";
+        }
+      }
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        responseDiv.innerHTML = "";
+        responseDiv.className = "";
+
+        submitBtn.disabled = true;
+        submitBtn.setAttribute("aria-busy", "true");
+        submitBtn.textContent = "Отправляем...";
+
+        submitForm(form);
+      });
+    });
+  </script>
+
+  <!-- сюда даже можно прописать даже код Yandex.Metrika если вам важна аналитика формы -->
+
+</body>
+
+</html>
