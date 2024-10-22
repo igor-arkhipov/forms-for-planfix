@@ -79,6 +79,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         returnHtmxResponse(false, "Возникла ошибка");
     }
 } else {
-    returnHtmxResponse(false, "Неравильный тип запроса");
+    returnHtmxResponse(false, "Неправильный тип запроса");
 }
 ?>
