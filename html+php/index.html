@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+  <script src="https://unpkg.com/htmx.org@2.0.2"></script>
+
+  <style>
+    body {
+      padding: 2rem;
+    }
+    
+    h1 {
+      text-align: center;
+    }
+
+    form {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    #submitArea {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    #spinner {
+      display: none;
+    }
+
+    .htmx-request #submitBtn {
+      display: none;
+    }
+
+    .htmx-request #spinner {
+      display: inline-block;
+    }
+  </style>
+
+  <title>Form for Planfix</title>
+  <!-- ⚠️ тут меняйте текст что пойдёт во вкладку браузера -->
+</head>
+
+<body>
+  <main class="container">
+
+    <h1>Simple form for Planfix</h1>
+    <!-- ⚠️ тут меняйте заголовок над формой -->
+    
+    <form id="planfixForm" hx-post="form-processing.php" hx-target="#submitArea" hx-swap="innerHTML">
+      <div>
+        <label for="name">Название:</label>
+        <input type="text" id="name" name="name" required />
+      </div>
+
+      <div>
+        <label for="description">Описание:</label>
+        <textarea id="description" name="description" placeholder="Введите описание" required></textarea>
+      </div>
+
+      <div>
+        <label for="phone">Телефон:</label>
+        <input type="tel" inputmode="tel" id="phone" name="phone" placeholder="+79993331122" required />
+      </div>
+
+      <div>
+        <label for="email">Email:</label>
+        <input type="email" inputmode="email" id="email" name="email" placeholder="name@gmail.com" required />
+      </div>
+
+      <div id="submitArea">
+        <button type="submit" id="submitBtn" disabled>Отравить запрос</button>
+        <div id="spinner">Обрабатываем...</div>
+      </div>
+    </form>
+    <div id="spinner" class="htmx-indicator">Обрабатываем...</div>
+    <div id="response"></div>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.getElementById("planfixForm");
+      const submitBtn = document.getElementById("submitBtn");
+
+      function validateForm() {
+        const isValid = form.checkValidity();
+        submitBtn.disabled = !isValid;
+      }
+
+      form.addEventListener("input", validateForm);
+      validateForm(); 
+
+    });
+  </script>
+
+    <!-- сюда даже можно прописать код Yandex.Metrika если вам важна аналитика формы -->
+</body>
+
+</html>
